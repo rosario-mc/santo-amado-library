@@ -1,6 +1,6 @@
 # Playground Library
 
-Personal digital library for managing and accessing our book and coloring collection remotely.
+Personal digital library for managing and accessing our book and coloring pages collection remotely.
 
 
 ### Coming Soon
