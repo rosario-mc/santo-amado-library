@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Playground Library
 
-## Getting Started
+Personal digital library for managing and accessing our book and coloring collection remotely.
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Coming Soon
+Will be adding simple games:
+- Games will be tailored for children between the ages of 4-6
+- Games will be educational games:
+    - Math games
+    - Reading games
+    - Tic tac toe
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Browse library with cover images and metadata
+- Upload books with PDF files and covers
+- Delete books from collection
+- Remote access via Tailscale
+- Dark mode support
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- Next.js 16 + React 19 + TypeScript
+- Tailwind CSS 4
+- Supabase (database & storage)
+- Deployed on Raspberry Pi with PM2
+- Tailscale for remote access
 
-To learn more about Next.js, take a look at the following resources:
+## Quick Reference
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Accessing the Library
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Device | URL |
+|--------|-----|
+| Raspberry Pi | `http://localhost:3000` |
+| Phone/Remote | `http://100.88.146.75:3000` |
 
-## Deploy on Vercel
+### Updating the App
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    pm2 stop santo-amado-library
+    git pull
+    npm install
+    npm run build
+    pm2 restart santo-amado-library
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Managing PM2
+
+    pm2 status                           # Check app status
+    pm2 logs santo-amado-library         # View logs
+    pm2 restart santo-amado-library      # Restart app
+
+## Project Structure
+
+    app/
+    ├── page.tsx          # Home page
+    ├── library/          # Browse books
+    └── upload/           # Upload new books
+
+## Environment Variables
+
+Required in `.env.local`:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+## License
+
+Private project for personal use.
