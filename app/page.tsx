@@ -37,20 +37,20 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-zinc-50 font-sans dark:bg-black">
+    <div className="font-sans">
       <main className="w-full max-w-6xl mx-auto flex flex-col items-center gap-8 py-10 px-4 sm:px-6">
         <div className="flex flex-col items-center gap-4 text-center">
           <h1 className="text-3xl text-black font-semibold">
             Welcome, {selectedProfile?.name}! 👋
           </h1>
           <Image
-            src="/main-logo.png"
+            src="/home-logo.png"
             alt="Welcome to Santorio's & Amado's Library"
             width={600}
             height={300}
             priority
           />
-          <p className="text-lg text-zinc-600 dark:text-zinc-400">
+          <p className="text-lg text-black font-semibold">
             Your personal library and games collection!
           </p>
         </div>

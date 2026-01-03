@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface Book {
   id: string
@@ -83,15 +83,15 @@ export default function LibraryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
-        <p className="text-xl text-black dark:text-white">Loading library...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-black">Loading library...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-xl text-red-500">Error: {error}</p>
       </div>
     )
@@ -114,7 +114,7 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black py-12 px-4">
+    <div className="min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-black">
@@ -140,15 +140,15 @@ export default function LibraryPage() {
           {books.map((book) => (
             <div
               key={book.id}
-              className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+              className="backdrop-blur-md bg-white/10 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
             >
               {/* Cover Image */}
-              <div className="relative h-64 bg-zinc-200 dark:bg-zinc-800">
+              <div className="relative h-64">
                 {book.cover_image_url ? (
                   <img
                     src={book.cover_image_url}
                     alt={book.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
@@ -159,20 +159,20 @@ export default function LibraryPage() {
 
               {/* Book Info */}
               <div className="p-4">
-                <h2 className="text-xl font-bold text-black dark:text-white mb-2 line-clamp-2">
+                <h2 className="text-xl font-bold text-black mb-2 line-clamp-2">
                   {book.title}
                 </h2>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">
+                <p className="text-sm text-zinc-600 mb-2">
                   by {book.author}
                 </p>
                 {book.description && (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-4 line-clamp-3">
+                  <p className="text-sm text-zinc-500 mb-4 line-clamp-3">
                     {book.description}
                   </p>
                 )}
 
                 {/* Metadata */}
-                <div className="flex gap-4 text-xs text-zinc-500 dark:text-zinc-500 mb-4">
+                <div className="flex gap-4 text-xs text-zinc-500 mb-4">
                   {book.total_pages && <span>{book.total_pages} pages</span>}
                   {book.file_size_mb && <span>{book.file_size_mb} MB</span>}
                 </div>
