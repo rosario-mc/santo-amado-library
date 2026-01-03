@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Book {
   id: string
@@ -20,8 +21,15 @@ export default function LibraryPage() {
   const [books, setBooks] = useState<Book[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [selectedProfile, setSelectedProfile] = useState<any>(null)
+  const isAdmin = selectedProfile?.role === 'admin'
+  const isUser = selectedProfile?.role === 'user'
 
   useEffect(() => {
+    const profileData = sessionStorage.getItem('selectedProfile')
+    if (profileData) {
+      setSelectedProfile(JSON.parse(profileData))
+    }
     fetchBooks()
   }, [])
 
@@ -43,35 +51,35 @@ export default function LibraryPage() {
   }
 
   const deleteBook = async (book: Book) => {
-  if (!confirm(`Are you sure you want to delete "${book.title}"?`)) {
-    return
-  }
-
-  try {
-    const pdfFileName = book.pdf_url.split('/').pop()
-    if (pdfFileName) {
-      await supabase.storage.from('books').remove([pdfFileName])
+    if (!confirm(`Are you sure you want to delete "${book.title}"?`)) {
+      return
     }
 
-    if (book.cover_image_url) {
-      const coverFileName = book.cover_image_url.split('/').pop()
-      if (coverFileName) {
-        await supabase.storage.from('books').remove([coverFileName])
+    try {
+      const pdfFileName = book.pdf_url.split('/').pop()
+      if (pdfFileName) {
+        await supabase.storage.from('books').remove([pdfFileName])
       }
+
+      if (book.cover_image_url) {
+        const coverFileName = book.cover_image_url.split('/').pop()
+        if (coverFileName) {
+          await supabase.storage.from('books').remove([coverFileName])
+        }
+      }
+
+      const { error } = await supabase
+        .from('books')
+        .delete()
+        .eq('id', book.id)
+
+      if (error) throw error
+
+      fetchBooks()
+    } catch (error: any) {
+      alert(`Error deleting book: ${error.message}`)
     }
-
-    const { error } = await supabase
-      .from('books')
-      .delete()
-      .eq('id', book.id)
-
-    if (error) throw error
-
-    fetchBooks()
-  } catch (error: any) {
-    alert(`Error deleting book: ${error.message}`)
   }
-}
 
   if (loading) {
     return (
@@ -91,14 +99,16 @@ export default function LibraryPage() {
 
   if (books.length === 0) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black flex flex-col items-center justify-center gap-4">
-        <p className="text-xl text-black dark:text-white">No books in library yet</p>
-        <Link
-          href="/upload"
-          className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200"
-        >
-          Upload Your First Book
-        </Link>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <p className="text-xl text-black">No books in library yet</p>
+        {isAdmin && (
+          <Link
+            href="/upload"
+            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-zinc-800"
+          >
+            Upload Your First Book
+          </Link>
+        )}
       </div>
     )
   }
@@ -107,15 +117,23 @@ export default function LibraryPage() {
     <div className="min-h-screen bg-zinc-50 dark:bg-black py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-black dark:text-white">
-            Library
+          <h1 className="text-4xl font-bold text-black">
+            <Image
+              src="/library.png"
+              alt="Library"
+              width={200}
+              height={100}
+              priority
+            />
           </h1>
-          <Link
-            href="/upload"
-            className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200"
-          >
-            Upload Book
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/upload"
+              className="px-6 py-3 bg-black text-white rounded-lg hover:bg-zinc-800"
+            >
+              Upload Book
+            </Link>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -161,29 +179,26 @@ export default function LibraryPage() {
 
                 {/* Actions */}
                 <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                        <a
-                          href={book.pdf_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 text-center px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm hover:bg-zinc-800 dark:hover:bg-zinc-200"
-                        >
-                          Read
-                        </a>
-                        <a
-                          href={book.pdf_url}
-                          download
-                          className="flex-1 text-center px-4 py-2 border border-black dark:border-white text-black dark:text-white rounded-lg text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                        >
-                          Download
-                        </a>
-                    </div>
+                  <div className="flex gap-2">
+                    {isUser && (
+                    <a
+                      href={book.pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 text-center px-4 py-2 bg-green-200 text-rose-600 border border-blue-600 rounded-lg text-sm hover:bg-yellow-100"
+                    >
+                      Read
+                    </a>
+                    )}
+                  </div>
+                  {isAdmin && (
                     <button
                       onClick={() => deleteBook(book)}
                       className="w-full px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600"
                     >
                       Delete
                     </button>
+                  )}
                 </div>
               </div>
             </div>
