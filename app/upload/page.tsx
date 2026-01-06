@@ -1,112 +1,166 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import Image from "next/image";
+import Image from "next/image"
 
-export default function UploadPage()  {
-    const [title, setTitle] = useState('')
-    const [author, setAuthor] = useState('')
-    const [description, setDescription] = useState('')
-    const [totalPages, setTotalPages] = useState<number | ''>('')
-    const [pdfFile, setPdfFile] = useState<File | null>(null)
-    const [coverFile, setCoverFile] = useState<File | null>(null)
-    const [uploading, setUploading] = useState(false)
-    const [message, setMessage] = useState('')
-    const pdfInputRef = useRef<HTMLInputElement>(null)
-    const coverInputRef = useRef<HTMLInputElement>(null)
+type UploadType = 'book' | 'activity'
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+export default function UploadPage() {
+  const searchParams = useSearchParams()
+  const typeFromUrl = searchParams.get('type') as UploadType | null
+  const [uploadType, setUploadType] = useState<UploadType>(typeFromUrl === 'activity' ? 'activity' : 'book')
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [description, setDescription] = useState('')
+  const [totalPages, setTotalPages] = useState<number | ''>('')
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [message, setMessage] = useState('')
+  const pdfInputRef = useRef<HTMLInputElement>(null)
+  const coverInputRef = useRef<HTMLInputElement>(null)
 
-        if (!pdfFile) {
-            setMessage('Please select a PDF file')
-            return
-        }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-        setUploading(true)
-        setMessage('')
-
-        try {
-            const fileSizeMB = (pdfFile.size / (1024 * 1024)).toFixed(2)
-
-            const sanitizedPdfName = pdfFile.name.replace(/\s+/g, '_')
-            const pdfPath = `${Date.now()}-${sanitizedPdfName}`
-
-            const { error: pdfError } = await supabase.storage
-                .from('books')
-                .upload(pdfPath, pdfFile)
-            
-            if (pdfError) throw pdfError
-
-            const { data: pdfData } = supabase.storage
-                .from('books')
-                .getPublicUrl(pdfPath)
-
-            let coverUrl = null
-            if (coverFile) {
-                const sanitizedName = coverFile.name.replace(/\s+/g, '_')
-                const coverPath = `${Date.now()}-${sanitizedName}`
-                const { error: coverError } = await supabase.storage
-                    .from('books')
-                    .upload(coverPath, coverFile)
-
-                if (coverError) {
-                } else {
-                    const { data: coverData } = supabase.storage
-                        .from('books')
-                        .getPublicUrl(coverPath)
-                    coverUrl = coverData.publicUrl
-                }
-            }
-
-            const { error: dbError } = await supabase
-                .from('books')
-                .insert({
-                    title,
-                    author,
-                    description: description || null,
-                    pdf_url: pdfData.publicUrl,
-                    cover_image_url: coverUrl,
-                    total_pages: totalPages || null,
-                    file_size_mb: parseFloat(fileSizeMB),
-                })
-
-            if (dbError) throw dbError
-
-            setMessage('Book upload successful.')
-            setTitle('')
-            setAuthor('')
-            setDescription('')
-            setTotalPages('')
-            setPdfFile(null)
-            setCoverFile(null)
-
-            if (pdfInputRef.current) pdfInputRef.current.value = ''
-            if (coverInputRef.current) coverInputRef.current.value = ''
-
-        } catch (error: any) {
-            setMessage(`Error: ${error.message}`)
-        } finally {
-            setUploading(false)
-        }
+    if (!pdfFile) {
+      setMessage('Please select a PDF file')
+      return
     }
 
-return (
+    setUploading(true)
+    setMessage('')
+
+    try {
+      const fileSizeMB = (pdfFile.size / (1024 * 1024)).toFixed(2)
+
+      const storageBucket = uploadType === 'book' ? 'books' : 'activity_pages'
+      const tableName = uploadType === 'book' ? 'books' : 'activity_pages'
+
+      const sanitizedPdfName = pdfFile.name.replace(/\s+/g, '_')
+      const pdfPath = `${Date.now()}-${sanitizedPdfName}`
+
+      const { error: pdfError } = await supabase.storage
+        .from(storageBucket)
+        .upload(pdfPath, pdfFile)
+
+      if (pdfError) throw pdfError
+
+      const { data: pdfData } = supabase.storage
+        .from(storageBucket)
+        .getPublicUrl(pdfPath)
+
+      let coverUrl = null
+      if (coverFile) {
+        const sanitizedName = coverFile.name.replace(/\s+/g, '_')
+        const coverPath = `${Date.now()}-${sanitizedName}`
+        const { error: coverError } = await supabase.storage
+          .from(storageBucket)
+          .upload(coverPath, coverFile)
+
+        if (!coverError) {
+          const { data: coverData } = supabase.storage
+            .from(storageBucket)
+            .getPublicUrl(coverPath)
+          coverUrl = coverData.publicUrl
+        }
+      }
+
+      if (uploadType === 'book') {
+        const { error: dbError } = await supabase
+          .from('books')
+          .insert({
+            title,
+            author,
+            description: description || null,
+            pdf_url: pdfData.publicUrl,
+            cover_image_url: coverUrl,
+            total_pages: totalPages || null,
+            file_size_mb: parseFloat(fileSizeMB),
+          })
+        if (dbError) throw dbError
+      } else {
+        const { error: dbError } = await supabase
+          .from('activity_pages')
+          .insert({
+            title,
+            pdf_url: pdfData.publicUrl,
+            cover_image_url: coverUrl,
+            file_size_mb: parseFloat(fileSizeMB),
+          })
+        if (dbError) throw dbError
+      }
+
+      setMessage(`${uploadType === 'book' ? 'Book' : 'Activity page'} uploaded successfully!`)
+
+      setTitle('')
+      setAuthor('')
+      setDescription('')
+      setTotalPages('')
+      setPdfFile(null)
+      setCoverFile(null)
+      if (pdfInputRef.current) pdfInputRef.current.value = ''
+      if (coverInputRef.current) coverInputRef.current.value = ''
+
+    } catch (error: any) {
+      setMessage(`Error: ${error.message}`)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-2xl mx-auto backdrop-blur-md bg-white/10 rounded-lg shadow-lg p-8">
+
+        {/* Toggle Buttons */}
+        <div className="flex gap-4 mb-6">
+          <button
+            type="button"
+            onClick={() => setUploadType('book')}
+            className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${uploadType === 'book'
+              ? 'bg-black text-white'
+              : 'bg-white text-black border border-black hover:bg-gray-100'
+              }`}
+          >
+            📚 Upload Book
+          </button>
+          <button
+            type="button"
+            onClick={() => setUploadType('activity')}
+            className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${uploadType === 'activity'
+              ? 'bg-black text-white'
+              : 'bg-white text-black border border-black hover:bg-gray-100'
+              }`}
+          >
+            📄 Upload Activity Page
+          </button>
+        </div>
+
         <h1 className="text-3xl font-bold mb-6 text-black">
-          <Image
-          src="/upload-new-book.png"
-          alt="Upload New Book"
-          width={320}
-          height={150}
-          priority
-          />
+          {uploadType === 'book' ? (
+            <Image
+              src="/upload-new-book.png"
+              alt="Upload New Book"
+              width={320}
+              height={150}
+              priority
+            />
+          ) : (
+            <span><Image
+              src="/upload-new-act-page.png"
+              alt="Upload New Book"
+              width={450}
+              height={150}
+              priority
+            /></span>
+          )}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
+          {/* Title - Always shown */}
           <div>
             <label className="block text-sm font-medium mb-2 text-black">
               Title *
@@ -120,48 +174,54 @@ return (
             />
           </div>
 
-          {/* Author */}
-          <div>
-            <label className="block text-sm font-medium mb-2 text-black">
-              Author *
-            </label>
-            <input
-              type="text"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              required
-              className="w-full px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          {/* Author - Only for books */}
+          {uploadType === 'book' && (
+            <div>
+              <label className="block text-sm font-medium mb-2 text-black">
+                Author *
+              </label>
+              <input
+                type="text"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                required
+                className="w-full px-4 py-2 border rounded-lg text-black"
+              />
+            </div>
+          )}
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium mb-2 text-black">
-              Description
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="w-full px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          {/* Description - Only for books */}
+          {uploadType === 'book' && (
+            <div>
+              <label className="block text-sm font-medium mb-2 text-black">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                className="w-full px-4 py-2 border rounded-lg text-black"
+              />
+            </div>
+          )}
 
-          {/* Total Pages - NEW */}
-          <div>
-            <label className="block text-sm font-medium mb-2 text-black">
-              Total Pages
-            </label>
-            <input
-              type="number"
-              value={totalPages}
-              onChange={(e) => setTotalPages(e.target.value ? parseInt(e.target.value) : '')}
-              min="1"
-              className="w-full px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          {/* Total Pages - Only for books */}
+          {uploadType === 'book' && (
+            <div>
+              <label className="block text-sm font-medium mb-2 text-black">
+                Total Pages
+              </label>
+              <input
+                type="number"
+                value={totalPages}
+                onChange={(e) => setTotalPages(e.target.value ? parseInt(e.target.value) : '')}
+                min="1"
+                className="w-full px-4 py-2 border rounded-lg text-black"
+              />
+            </div>
+          )}
 
-          {/* PDF File */}
+          {/* PDF File - Always shown */}
           <div>
             <label className="block text-sm font-medium mb-2 text-black">
               PDF File *
@@ -181,7 +241,7 @@ return (
             )}
           </div>
 
-          {/* Cover Image */}
+          {/* Cover Image - Always shown */}
           <div>
             <label className="block text-sm font-medium mb-2 text-black">
               Cover Image (optional)
@@ -193,7 +253,6 @@ return (
               onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
               className="w-full text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-black file:bg-white file:text-black file:font-medium hover:file:bg-zinc-300 file:cursor-pointer"
             />
-
           </div>
 
           {/* Submit Button */}
@@ -202,7 +261,10 @@ return (
             disabled={uploading}
             className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-zinc-800 disabled:opacity-50"
           >
-            {uploading ? 'Uploading...' : 'Upload Book'}
+            {uploading
+              ? 'Uploading...'
+              : `Upload ${uploadType === 'book' ? 'Book' : 'Activity Page'}`
+            }
           </button>
 
           {/* Message */}
