@@ -38,7 +38,7 @@ export default function LibraryPage() {
       const { data, error } = await supabase
         .from('books')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('title', { ascending: true })
 
       if (error) throw error
 
@@ -128,7 +128,7 @@ export default function LibraryPage() {
           </h1>
           {isAdmin && (
             <Link
-              href="/upload"
+              href="/upload?type=book"
               className="px-6 py-3 bg-black text-white rounded-lg hover:bg-zinc-800"
             >
               Upload Book
