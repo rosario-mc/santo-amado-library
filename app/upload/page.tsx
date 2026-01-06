@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Image from "next/image"
 
 type UploadType = 'book' | 'activity'
 
-export default function UploadPage() {
+function UploadForm() {
   const searchParams = useSearchParams()
   const typeFromUrl = searchParams.get('type') as UploadType | null
   const [uploadType, setUploadType] = useState<UploadType>(typeFromUrl === 'activity' ? 'activity' : 'book')
@@ -276,5 +276,17 @@ export default function UploadPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function UploadPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen py-12 px-4 flex items-center justify-center">
+        <div className="text-black text-xl">Loading...</div>
+      </div>
+    }>
+      <UploadForm />
+    </Suspense>
   )
 }
