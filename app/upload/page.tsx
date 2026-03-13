@@ -3,7 +3,7 @@
 import { useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import Image from "next/image"
+import { PageTitle } from '@/components/ui'
 
 type UploadType = 'book' | 'activity'
 
@@ -141,20 +141,18 @@ function UploadForm() {
 
         <h1 className="text-3xl font-bold mb-6 text-black">
           {uploadType === 'book' ? (
-            <Image
+            <PageTitle
               src="/upload-new-book.png"
               alt="Upload New Book"
               width={320}
               height={150}
-              priority
             />
           ) : (
-            <span><Image
+            <span><PageTitle
               src="/upload-new-act-page.png"
-              alt="Upload New Book"
+              alt="Upload New Activity Page"
               width={450}
               height={150}
-              priority
             /></span>
           )}
         </h1>
