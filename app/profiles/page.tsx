@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import Image from 'next/image'
+import { Card, CoverImage, PageTitle } from '@/components/ui'
 
 interface Profile {
     id: string
@@ -83,56 +83,38 @@ export default function ProfilePage() {
         <div className="flex-1 pt-12 pb-4 px-4">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col justify-center items-center mb-8 gap-4">
-                    <Image
+                    <PageTitle
                         src="/welcome.png"
                         alt="Welcome to"
                         width={300}
                         height={100}
-                        priority
                     />
-                    <Image
+                    <PageTitle
                         src="/home-logo.png"
                         alt="Welcome to Santorio's & Amado's Library"
                         width={600}
                         height={300}
-                        priority
                     />
-                    <Image
+                    <PageTitle
                         src="/select-profile.png"
                         alt="Profiles"
                         width={400}
                         height={300}
-                        priority
                     />
                 </div>
                 <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto">
                     {profiles.map((profile) => (
-                        <div
+                        <Card
                             key={profile.id}
                             onClick={() => handleSelectProfile(profile)}
-                            className="backdrop-blur-md bg-white/10 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer w-80"
+                            className="w-80"
                         >
                             <div className="p-4">
                                 <h2 className="text-xl font-bold text-blue-700 mb-2 text-center">
                                     {profile.name}
                                 </h2>
                             </div>
-                            {/* Avatar Image */}
-                            <div className="relative h-64">
-                                {profile.avatar_image_url ? (
-                                    <img
-                                        src={profile.avatar_image_url}
-                                        alt={profile.name}
-                                        className="w-full h-full object-contain"
-                                    />
-                                ) : (
-                                    <div className="flex items-center justify-center h-full">
-                                        <span className="text-6xl">📚</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Profile Info */}
+                            <CoverImage src={profile.avatar_image_url} alt={profile.name} />
                             {profile.age && (
                                 <div className="p-4">
                                     <p className="text-sm text-zinc-600 text-center">
@@ -140,8 +122,7 @@ export default function ProfilePage() {
                                     </p>
                                 </div>
                             )}
-
-                        </div>
+                        </Card>
                     ))}
                 </div>
             </div>

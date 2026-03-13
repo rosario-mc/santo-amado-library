@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from "next/image";
-import Link from "next/link";
+import { Card, CardIcon, PageTitle } from '@/components/ui'
 
 interface Profile {
   id: string
@@ -43,92 +42,38 @@ export default function Home() {
           <h1 className="text-3xl text-black font-semibold">
             Welcome, {selectedProfile?.name}! 👋
           </h1>
-          <Image
-            src="/home-logo.png"
-            alt="Welcome to Santorio's & Amado's Library"
-            width={600}
-            height={300}
-            priority
-          />
+            <PageTitle
+              src="/home-logo.png"
+              alt="Welcome to Santorio's & Amado's Library"
+              width={600}
+              height={300}
+            />
           <p className="text-lg text-black font-semibold">
             Your personal library and games collection!
           </p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 w-full">
-          <Link
-            className="w-80 flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border-2 border-zinc-200 hover:border-black transition-all hover:shadow-lg backdrop-blur-md bg-white/10"
-            href="/library"
-          >
-            <span className="text-5xl">
-              <Image
-                src="/triceratops.png"
-                alt="📚"
-                width={200}
-                height={200}
-                priority
-              />
-            </span>
-            <h2 className="text-xl font-semibold text-black text-center">
-              Browse Books
-            </h2>
-          </Link>
+          <Card href="/library" className="w-80 flex flex-col items-center justify-center gap-4 p-8">
+            <CardIcon src="/triceratops.png" alt="Browse Books" />
+            <h2 className="text-xl font-semibold text-black text-center">Browse Books</h2>
+          </Card>
           {selectedProfile?.role === 'admin' && (
-            <Link
-              className="w-80 flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border-2 border-zinc-200 hover:border-black transition-all hover:shadow-lg backdrop-blur-md bg-white/10"
-              href="/upload"
-            >
-              <span className="text-5xl">
-                <Image
-                  src="/upload.png"
-                  alt="Browse Books"
-                  width={200}
-                  height={200}
-                  priority
-                />
-              </span>
-              <h2 className="text-xl font-semibold text-black text-center">
-                Upload a New Book
-              </h2>
-            </Link>
+            <Card href="/upload" className="w-80 flex flex-col items-center justify-center gap-4 p-8">
+              <CardIcon src="/upload.png" alt="Upload" />
+              <h2 className="text-xl font-semibold text-black text-center">Upload a New Book</h2>
+            </Card>
           )}
-          <Link
-            className="w-80 flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border-2 border-zinc-200 hover:border-black transition-all hover:shadow-lg backdrop-blur-md bg-white/10"
-            href="/games"
-          >
-            <span className="text-5xl">
-              <Image
-                src="/crab.png"
-                alt="🎮"
-                width={150}
-                height={70}
-                priority
-              />
-            </span>
-            <h2 className="text-xl font-semibold text-black text-center">
-              Browse Games
-            </h2>
-          </Link>
-          <Link
-            className="w-80 flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border-2 border-zinc-200 hover:border-black transition-all hover:shadow-lg backdrop-blur-md bg-white/10"
-            href="/activity-pages"
-          >
-            <span className="text-5xl">
-              <Image
-                src="/elephant.avif"
-                alt="📚"
-                width={200}
-                height={200}
-                priority
-              />
-            </span>
-            <h2 className="text-xl font-semibold text-black text-center">
-              Browse Activity Pages
-            </h2>
-          </Link>
+          <Card href="/games" className="w-80 flex flex-col items-center justify-center gap-4 p-8">
+            <CardIcon src="/crab.png" alt="Browse Games" size={150} />
+            <h2 className="text-xl font-semibold text-black text-center">Browse Games</h2>
+          </Card>
+          <Card href="/activity-pages" className="w-80 flex flex-col items-center justify-center gap-4 p-8">
+            <CardIcon src="/elephant.avif" alt="Activity Pages" />
+            <h2 className="text-xl font-semibold text-black text-center">Browse Activity Pages</h2>
+          </Card>
         </div>
       </main>
     </div>
-  );
+  )
 }
-
