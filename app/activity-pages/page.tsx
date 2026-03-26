@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { Card, CoverImage, CardGrid, PageLayout, PageTitle } from '@/components/ui'
+import { Card, CoverImage, CardGrid, PageLayout, PageTitle, GameButton, SkeletonGrid } from '@/components/ui'
 
 interface ActivityPage {
     id: string
@@ -79,16 +79,21 @@ export default function ActivityPagesPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <p className="text-xl text-black">Loading Activity Pages...</p>
-            </div>
+            <PageLayout>
+                <div className="flex justify-between items-center mb-10 animate-slide-up">
+                    <div className="flex items-center gap-4">
+                        <PageTitle src="/activity-page.png" alt="Activity Pages" width={350} height={200} />
+                    </div>
+                </div>
+                <SkeletonGrid count={8} />
+            </PageLayout>
         )
     }
 
     if (error) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <p className="text-xl text-red-500">Error: {error}</p>
+                <p className="text-xl text-red-500 font-bold">Error: {error}</p>
             </div>
         )
     }
@@ -96,13 +101,11 @@ export default function ActivityPagesPage() {
     if (activityPages.length === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-                <p className="text-xl text-black">No activity pages in library yet</p>
+                <span className="text-6xl animate-float">🎨</span>
+                <p className="text-xl font-bold text-white/70">No activity pages in library yet</p>
                 {isAdmin && (
-                    <Link
-                        href="/upload"
-                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-zinc-800"
-                    >
-                        Upload Your First Activity Page
+                    <Link href="/upload">
+                        <GameButton color="green" size="lg">Upload Your First Activity Page</GameButton>
                     </Link>
                 )}
             </div>
@@ -111,54 +114,53 @@ export default function ActivityPagesPage() {
 
     return (
         <PageLayout>
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-4xl font-bold text-black">
+            <div className="flex justify-between items-center mb-10 animate-slide-up">
+                <div className="flex items-center gap-4">
                     <PageTitle
                         src="/activity-page.png"
                         alt="Activity Pages"
                         width={350}
                         height={200}
                     />
-                </h1>
+                </div>
                 {isAdmin && (
-                    <Link
-                        href="/upload?type=activity"
-                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-zinc-800"
-                    >
-                        Upload Activity Pages
+                    <Link href="/upload?type=activity">
+                        <GameButton color="green" size="md">Upload Activity Pages</GameButton>
                     </Link>
                 )}
             </div>
 
             <CardGrid>
-                {activityPages.map((activityPage) => (
-                    <Card key={activityPage.id}>
+                {activityPages.map((activityPage, i) => (
+                    <Card key={activityPage.id} className={`animate-bounce-in stagger-${Math.min(i + 1, 6)}`}>
                         <CoverImage src={activityPage.cover_image_url} alt={activityPage.title} />
 
                         <div className="p-4">
-                            <h2 className="text-xl font-bold text-black mb-2 line-clamp-2">
+                            <h2
+                                className="text-lg font-black mb-2 line-clamp-2 text-white"
+                                style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
+                            >
                                 {activityPage.title}
                             </h2>
 
-                            <div className="flex gap-4 text-xs text-zinc-500 mb-4">
+                            <div className="flex gap-4 text-xs text-white/30 mb-4 font-medium">
                                 {activityPage.file_size_mb && <span>{activityPage.file_size_mb} MB</span>}
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <div className="flex gap-2">
-                                    <a
-                                        href={activityPage.pdf_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex-1 text-center px-4 py-2 bg-green-200 text-rose-600 border border-blue-600 rounded-lg text-sm hover:bg-yellow-100"
-                                    >
-                                        Print
-                                    </a>
-                                </div>
+                                <a
+                                    href={activityPage.pdf_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 text-center px-4 py-2.5 bg-[#22C55E] text-[#0B3D1C] rounded-full text-sm font-black shadow-[0_4px_0_#166534] hover:shadow-[0_2px_0_#166534] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all"
+                                    style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
+                                >
+                                    🖨️ PRINT
+                                </a>
                                 {isAdmin && (
                                     <button
                                         onClick={() => deleteActivityPage(activityPage)}
-                                        className="w-full px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600"
+                                        className="w-full px-4 py-2 bg-red-600 text-white rounded-full text-sm font-bold shadow-[0_4px_0_#991b1b] hover:shadow-[0_2px_0_#991b1b] hover:translate-y-[2px] transition-all"
                                     >
                                         Delete
                                     </button>
