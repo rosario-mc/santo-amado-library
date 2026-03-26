@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-// ---- Card 1: Glassmorphic card (books, activity pages, profiles, home menu tiles) ----
+// ---- Card: Bold card with 3D tilt ----
 export function Card({
   children,
   onClick,
@@ -14,20 +14,26 @@ export function Card({
   href?: string
   className?: string
 }) {
-  const styles = `backdrop-blur-md bg-white/10 rounded-2xl border-2 border-zinc-200 shadow-lg overflow-hidden hover:shadow-xl hover:border-black transition-all ${onClick || href ? 'cursor-pointer' : ''} ${className}`
+  const styles = `relative bg-[#143D22] rounded-2xl border-3 border-[#22C55E]/40 shadow-[0_8px_30px_rgba(0,0,0,0.3)] overflow-hidden card-3d ${onClick || href ? 'cursor-pointer' : ''} ${className}`
 
   if (href) {
-    return <Link href={href} className={styles}>{children}</Link>
+    return (
+      <Link href={href} className={styles}>
+        <div className="card-3d-shine" />
+        {children}
+      </Link>
+    )
   }
 
   return (
     <div onClick={onClick} className={styles}>
+      <div className="card-3d-shine" />
       {children}
     </div>
   )
 }
 
-// ---- Card 2: Colorful bordered card (all games) ----
+// ---- GameCard: Bold colored card with thick border ----
 export function GameCard({
   children,
   color = 'purple',
@@ -38,16 +44,19 @@ export function GameCard({
   className?: string
 }) {
   const colorMap = {
-    purple: 'border-purple-300 bg-purple-50/50',
-    blue: 'border-blue-300 bg-blue-50/50',
-    green: 'border-green-300 bg-green-50',
-    indigo: 'border-indigo-300 bg-indigo-50/50',
-    orange: 'border-orange-300 bg-orange-50',
-    yellow: 'border-yellow-300 bg-yellow-50',
+    purple: 'border-teal-500 bg-[#0C4A3A] shadow-[0_8px_0_rgba(20,184,166,0.4)]',
+    blue: 'border-blue-500 bg-[#0C3A5A] shadow-[0_8px_0_rgba(59,130,246,0.4)]',
+    green: 'border-green-500 bg-[#0B3D1C] shadow-[0_8px_0_rgba(34,197,94,0.4)]',
+    indigo: 'border-sky-500 bg-[#0C3650] shadow-[0_8px_0_rgba(14,165,233,0.4)]',
+    orange: 'border-orange-500 bg-[#4A2C0A] shadow-[0_8px_0_rgba(251,146,60,0.4)]',
+    yellow: 'border-yellow-500 bg-[#3D3A0A] shadow-[0_8px_0_rgba(250,204,21,0.4)]',
   }
 
   return (
-    <div className={`rounded-3xl border-4 p-6 sm:p-10 text-center transition-colors duration-300 w-full max-w-md ${colorMap[color]} ${className}`}>
+    <div
+      className={`relative rounded-2xl border-4 p-6 sm:p-10 text-center transition-all duration-300 w-full max-w-md card-3d hover:translate-y-[-6px] ${colorMap[color]} ${className}`}
+    >
+      <div className="card-3d-shine" />
       {children}
     </div>
   )
@@ -81,11 +90,11 @@ export function CardIcon({
   size?: number
 }) {
   return (
-    <Image src={src} alt={alt} width={size} height={size} priority />
+    <Image src={src} alt={alt} width={size} height={size} priority className="hover-bounce" />
   )
 }
 
-// ---- Shared helpers ----
+// ---- CoverImage ----
 
 export function CoverImage({
   src,
@@ -97,12 +106,12 @@ export function CoverImage({
   fallbackEmoji?: string
 }) {
   return (
-    <div className="relative h-64">
+    <div className="relative h-64 bg-[#0A2F15] rounded-xl m-3 overflow-hidden border border-[#22C55E]/20 group">
       {src ? (
-        <img src={src} alt={alt} className="w-full h-full object-contain" />
+        <img src={src} alt={alt} className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-110" />
       ) : (
         <div className="flex items-center justify-center h-full">
-          <span className="text-6xl">{fallbackEmoji}</span>
+          <span className="text-6xl animate-float">{fallbackEmoji}</span>
         </div>
       )}
     </div>
@@ -111,7 +120,7 @@ export function CoverImage({
 
 export function CardGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {children}
     </div>
   )
@@ -125,6 +134,18 @@ export function PageLayout({ children }: { children: React.ReactNode }) {
   )
 }
 
+// ---- WaveDivider: SVG wave between sections ----
+export function WaveDivider({ from, to }: { from: string; to: string }) {
+  return (
+    <div className="w-full leading-[0] overflow-hidden" style={{ background: from }}>
+      <svg viewBox="0 0 1200 50" preserveAspectRatio="none" className="w-full h-[50px] block" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,25 C150,50 350,0 500,25 C650,50 850,0 1000,25 C1100,35 1150,30 1200,25 L1200,50 L0,50 Z" fill={to} />
+      </svg>
+    </div>
+  )
+}
+
+// ---- GameButton: 3D push effect, pill-shaped ----
 export function GameButton({
   children,
   onClick,
@@ -143,20 +164,20 @@ export function GameButton({
   type?: 'button' | 'submit'
 }) {
   const colorMap = {
-    green: 'bg-green-500 text-white hover:bg-green-600',
-    blue: 'bg-blue-500 text-white hover:bg-blue-600',
-    purple: 'bg-purple-500 text-white hover:bg-purple-600',
-    indigo: 'bg-indigo-500 text-white hover:bg-indigo-600',
-    yellow: 'bg-yellow-400 text-black hover:bg-yellow-500',
-    orange: 'bg-orange-400 text-white hover:bg-orange-500',
-    red: 'bg-red-500 text-white hover:bg-red-600',
-    black: 'bg-black text-white hover:bg-zinc-800',
+    green: 'bg-[#22C55E] text-[#0B3D1C] shadow-[0_6px_0_#166534] hover:shadow-[0_4px_0_#166534] hover:translate-y-[2px] active:shadow-[0_0px_0_#166534] active:translate-y-[6px]',
+    blue: 'bg-[#38BDF8] text-[#0C4A6E] shadow-[0_6px_0_#0369A1] hover:shadow-[0_4px_0_#0369A1] hover:translate-y-[2px] active:shadow-[0_0px_0_#0369A1] active:translate-y-[6px]',
+    purple: 'bg-[#4ECDC4] text-[#0B3D1C] shadow-[0_6px_0_#0F766E] hover:shadow-[0_4px_0_#0F766E] hover:translate-y-[2px] active:shadow-[0_0px_0_#0F766E] active:translate-y-[6px]',
+    indigo: 'bg-[#38BDF8] text-[#0C4A6E] shadow-[0_6px_0_#0369A1] hover:shadow-[0_4px_0_#0369A1] hover:translate-y-[2px] active:shadow-[0_0px_0_#0369A1] active:translate-y-[6px]',
+    yellow: 'bg-[#FFD93D] text-[#5C3D1E] shadow-[0_6px_0_#a16207] hover:shadow-[0_4px_0_#a16207] hover:translate-y-[2px] active:shadow-[0_0px_0_#a16207] active:translate-y-[6px]',
+    orange: 'bg-[#D4A76A] text-[#5C3D1E] shadow-[0_6px_0_#8B5E34] hover:shadow-[0_4px_0_#8B5E34] hover:translate-y-[2px] active:shadow-[0_0px_0_#8B5E34] active:translate-y-[6px]',
+    red: 'bg-red-500 text-white shadow-[0_6px_0_#991b1b] hover:shadow-[0_4px_0_#991b1b] hover:translate-y-[2px] active:shadow-[0_0px_0_#991b1b] active:translate-y-[6px]',
+    black: 'bg-[#1a1a1a] text-white shadow-[0_6px_0_#000] hover:shadow-[0_4px_0_#000] hover:translate-y-[2px] active:shadow-[0_0px_0_#000] active:translate-y-[6px]',
   }
 
   const sizeMap = {
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-6 py-3 text-base',
-    lg: 'px-8 py-4 text-lg',
+    sm: 'px-5 py-2 text-sm',
+    md: 'px-7 py-3 text-base',
+    lg: 'px-10 py-4 text-lg',
   }
 
   return (
@@ -164,7 +185,8 @@ export function GameButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${colorMap[color]} ${sizeMap[size]} rounded-xl font-bold shadow-lg active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
+      className={`${colorMap[color]} ${sizeMap[size]} rounded-full font-black tracking-wide transition-all duration-150 btn-press hover-glow disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none ${className}`}
+      style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
     >
       {children}
     </button>
@@ -179,13 +201,65 @@ export function GameLayout({ children }: { children: React.ReactNode }) {
   )
 }
 
+// ---- GameHeader: Bold text with star counter ----
 export function GameHeader({ title, score }: { title: string; score: number }) {
   return (
     <div className="text-center">
-      <h1 className="text-3xl sm:text-5xl font-bold text-black mb-1">{title}</h1>
-      <p className="text-lg text-zinc-500">
-        Stars collected: {'⭐'.repeat(Math.min(score, 20))} {score > 20 && `(${score})`}
+      <h1
+        className="text-4xl sm:text-6xl font-black text-shimmer mb-3"
+        style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
+      >
+        {title}
+      </h1>
+      <p className="text-lg font-bold text-[#22C55E]">
+        <span className="inline-block animate-heartbeat">⭐</span>{' '}
+        Stars collected: {score}
       </p>
+    </div>
+  )
+}
+
+// ---- Loading States ----
+
+export function LoadingSpinner({ text = 'Loading...' }: { text?: string }) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-5">
+      <div className="loading-spinner" />
+      <p
+        className="text-2xl font-black text-[#22C55E]"
+        style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
+      >
+        {text}
+      </p>
+      <div className="flex gap-2">
+        <div className="loading-dot" />
+        <div className="loading-dot" />
+        <div className="loading-dot" />
+      </div>
+    </div>
+  )
+}
+
+export function SkeletonCard() {
+  return (
+    <div className="bg-[#143D22] rounded-2xl border-3 border-[#22C55E]/20 overflow-hidden">
+      <div className="skeleton h-64 m-3 rounded-xl" />
+      <div className="p-4 space-y-3">
+        <div className="skeleton h-6 w-3/4 rounded-lg" />
+        <div className="skeleton h-4 w-1/2 rounded-lg" />
+        <div className="skeleton h-4 w-full rounded-lg" />
+        <div className="skeleton h-10 w-full rounded-full mt-4" />
+      </div>
+    </div>
+  )
+}
+
+export function SkeletonGrid({ count = 4 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {Array.from({ length: count }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
     </div>
   )
 }
