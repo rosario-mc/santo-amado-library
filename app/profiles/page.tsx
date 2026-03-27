@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CoverImage, PageTitle, LoadingSpinner } from '@/components/ui'
+import { useLanguage } from '@/lib/i18n'
 
 interface Profile {
     id: string
@@ -52,6 +53,7 @@ export default function ProfilePage() {
     const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
     const [clickedId, setClickedId] = useState<string | null>(null)
     const { playSelect } = useSoundEffect()
+    const { t } = useLanguage()
 
     useEffect(() => {
         fetchProfiles()
@@ -88,7 +90,7 @@ export default function ProfilePage() {
     }
 
     if (loading) {
-        return <LoadingSpinner text="Loading Profiles..." />
+        return <LoadingSpinner text={t('profiles.loading')} />
     }
 
     if (error) {
@@ -102,7 +104,7 @@ export default function ProfilePage() {
     if (profiles.length === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-                <p className="text-xl font-bold text-white/70">No Profiles in library yet</p>
+                <p className="text-xl font-bold text-white/70">{t('profiles.noProfiles')}</p>
             </div>
         )
     }
@@ -126,7 +128,7 @@ export default function ProfilePage() {
                     <h2
                         className="hero-text text-4xl sm:text-6xl text-shimmer mt-4"
                     >
-                        WHO&apos;S PLAYING? 🎮
+                        {t('profiles.whosPlaying')}
                     </h2>
                 </div>
                 <div className="flex flex-wrap justify-center gap-8 max-w-5xl mx-auto">
@@ -151,7 +153,7 @@ export default function ProfilePage() {
                                 {profile.age && (
                                     <div className="p-4">
                                         <p className="text-sm font-semibold text-center text-[#D4A76A]">
-                                            Age: {profile.age}
+                                            {t('profiles.age').replace('{age}', String(profile.age))}
                                         </p>
                                     </div>
                                 )}

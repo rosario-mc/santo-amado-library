@@ -3,12 +3,13 @@
 import { useRef, useCallback } from 'react'
 import { PageTitle } from '@/components/ui'
 import Link from 'next/link'
+import { useLanguage } from '@/lib/i18n'
 
 const games = [
   {
     id: 'addition',
-    title: 'ADDING FUN',
-    description: 'Practice adding numbers together!',
+    titleKey: 'index.addition.title',
+    descKey: 'index.addition.desc',
     emoji: '➕',
     bg: '#0B3D1C',
     border: 'border-[#22C55E]',
@@ -17,8 +18,8 @@ const games = [
   },
   {
     id: 'subtraction',
-    title: 'TAKE AWAY',
-    description: 'Practice subtraction with visual dots!',
+    titleKey: 'index.subtraction.title',
+    descKey: 'index.subtraction.desc',
     emoji: '➖',
     bg: '#0C4A6E',
     border: 'border-[#38BDF8]',
@@ -27,8 +28,8 @@ const games = [
   },
   {
     id: 'counting',
-    title: 'COUNTING',
-    description: 'Count the objects on screen!',
+    titleKey: 'index.counting.title',
+    descKey: 'index.counting.desc',
     emoji: '🔢',
     bg: '#1A3A2A',
     border: 'border-[#4ECDC4]',
@@ -37,8 +38,8 @@ const games = [
   },
   {
     id: 'typing',
-    title: 'TYPE IT!',
-    description: 'Listen and type the word!',
+    titleKey: 'index.typing.title',
+    descKey: 'index.typing.desc',
     emoji: '⌨️',
     bg: '#0C4A6E',
     border: 'border-[#38BDF8]',
@@ -47,8 +48,8 @@ const games = [
   },
   {
     id: 'word-scramble',
-    title: 'SCRAMBLE',
-    description: 'Unscramble letters to make a word!',
+    titleKey: 'index.scramble.title',
+    descKey: 'index.scramble.desc',
     emoji: '🔤',
     bg: '#3D3A0A',
     border: 'border-[#FFD93D]',
@@ -57,8 +58,8 @@ const games = [
   },
   {
     id: 'matching',
-    title: 'MATCH IT!',
-    description: 'Find the matching pairs!',
+    titleKey: 'index.matching.title',
+    descKey: 'index.matching.desc',
     emoji: '🃏',
     bg: '#1A3A2A',
     border: 'border-[#4ECDC4]',
@@ -67,8 +68,8 @@ const games = [
   },
   {
     id: 'simon-says',
-    title: 'SIMON SAYS',
-    description: 'Remember and repeat the pattern!',
+    titleKey: 'index.simon.title',
+    descKey: 'index.simon.desc',
     emoji: '🧠',
     bg: '#0C3650',
     border: 'border-[#38BDF8]',
@@ -77,8 +78,8 @@ const games = [
   },
   {
     id: 'color-mix',
-    title: 'COLOR MIX',
-    description: 'Mix colors and guess the result!',
+    titleKey: 'index.colorMix.title',
+    descKey: 'index.colorMix.desc',
     emoji: '🎨',
     bg: '#0B3D1C',
     border: 'border-[#22C55E]',
@@ -87,8 +88,8 @@ const games = [
   },
   {
     id: 'shape-builder',
-    title: 'SHAPES',
-    description: 'Identify different shapes!',
+    titleKey: 'index.shapes.title',
+    descKey: 'index.shapes.desc',
     emoji: '🔷',
     bg: '#0C3650',
     border: 'border-[#38BDF8]',
@@ -97,8 +98,8 @@ const games = [
   },
   {
     id: 'animal-sounds',
-    title: 'ANIMAL SOUNDS',
-    description: 'Guess the animal from its sound!',
+    titleKey: 'index.animals.title',
+    descKey: 'index.animals.desc',
     emoji: '🔊',
     bg: '#4A2C0A',
     border: 'border-[#D4A76A]',
@@ -107,8 +108,8 @@ const games = [
   },
   {
     id: 'odd-one-out',
-    title: 'ODD ONE OUT',
-    description: 'Find what doesn\'t belong!',
+    titleKey: 'index.oddOneOut.title',
+    descKey: 'index.oddOneOut.desc',
     emoji: '👀',
     bg: '#1A3A2A',
     border: 'border-[#4ECDC4]',
@@ -117,13 +118,23 @@ const games = [
   },
   {
     id: 'writing',
-    title: 'WRITE IT!',
-    description: 'Trace and practice writing letters!',
+    titleKey: 'index.writing.title',
+    descKey: 'index.writing.desc',
     emoji: '✏️',
     bg: '#5C3D1E',
     border: 'border-[#D4A76A]',
     shadow: 'shadow-[0_8px_0_#8B5E34]',
     hoverShadow: 'hover:shadow-[0_4px_0_#8B5E34]',
+  },
+  {
+    id: 'mario-runner',
+    titleKey: 'index.mathRun.title',
+    descKey: 'index.mathRun.desc',
+    emoji: '🏃',
+    bg: '#5C1A1A',
+    border: 'border-[#EF4444]',
+    shadow: 'shadow-[0_8px_0_#B91C1C]',
+    hoverShadow: 'hover:shadow-[0_4px_0_#B91C1C]',
   },
 ]
 
@@ -154,9 +165,11 @@ function useSoundEffect() {
 function GameCard3D({
   game,
   index,
+  t,
 }: {
   game: typeof games[0]
   index: number
+  t: (key: string) => string
 }) {
   const { playPop } = useSoundEffect()
 
@@ -173,15 +186,17 @@ function GameCard3D({
           className="text-2xl sm:text-3xl font-black text-white"
           style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
         >
-          {game.title}
+          {t(game.titleKey)}
         </h2>
-        <p className="text-sm text-white/60 text-center font-medium">{game.description}</p>
+        <p className="text-sm text-white/60 text-center font-medium">{t(game.descKey)}</p>
       </div>
     </Link>
   )
 }
 
 export default function GamesPage() {
+  const { t } = useLanguage()
+
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -193,13 +208,13 @@ export default function GamesPage() {
             height={100}
           />
           <h1 className="hero-text text-4xl sm:text-6xl text-shimmer text-center">
-            CHOOSE YOUR GAME
+            {t('chooseYourGame')}
           </h1>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {games.map((game, i) => (
-            <GameCard3D key={game.id} game={game} index={i} />
+            <GameCard3D key={game.id} game={game} index={i} t={t} />
           ))}
         </div>
       </div>

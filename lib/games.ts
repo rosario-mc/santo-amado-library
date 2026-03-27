@@ -1,3 +1,5 @@
+import { randomCheer as randomCheerI18n, speakWord as speakWordI18n } from './i18n'
+
 export const CHEERS = [
   'Great job! ⭐',
   'Amazing! 🌟',
@@ -7,16 +9,20 @@ export const CHEERS = [
   'Wow! 🌈',
   'Fantastic! 🎊',
   'Way to go! 🚀',
+  'Wahoo! 🪙',
+  "Let's-a go! 🍄",
+  'Mamma mia! 🌟',
+  'Here we go! 🪙',
+  'Yahoo! ⭐',
+  'Okey-dokey! 🍄',
+  'Power up! 💥',
+  'Super! 🌟',
 ]
 
-export function randomCheer() {
-  return CHEERS[Math.floor(Math.random() * CHEERS.length)]
+export function randomCheer(lang: 'en' | 'es' = 'en') {
+  return randomCheerI18n(lang)
 }
 
-export function speakWord(word: string) {
-  window.speechSynthesis.cancel()
-  const utterance = new SpeechSynthesisUtterance(word)
-  utterance.rate = 0.8
-  utterance.pitch = 1.1
-  window.speechSynthesis.speak(utterance)
+export function speakWord(word: string, lang: 'en' | 'es' = 'en') {
+  speakWordI18n(word, lang)
 }
