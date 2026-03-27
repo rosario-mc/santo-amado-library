@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { CardIcon, PageTitle, WaveDivider, LoadingSpinner } from '@/components/ui'
 import Link from 'next/link'
+import { useLanguage } from '@/lib/i18n'
 
 interface Profile {
   id: string
@@ -190,6 +191,7 @@ function SectionCard({
 
 export default function Home() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const menuReveal = useScrollReveal()
@@ -218,7 +220,7 @@ export default function Home() {
   }, [router])
 
   if (loading) {
-    return <LoadingSpinner text="Loading..." />
+    return <LoadingSpinner text={t('loading')} />
   }
 
   return (
@@ -242,8 +244,8 @@ export default function Home() {
               style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
             >
               {selectedProfile?.name
-                ? `Welcome back, ${selectedProfile.name}!`
-                : 'Your personal library and games collection!'}
+                ? t('home.welcomeBack').replace('{name}', selectedProfile.name)
+                : t('home.subtitle')}
             </p>
           </StoryPopup>
 
@@ -270,7 +272,7 @@ export default function Home() {
               className="text-xl sm:text-2xl font-black text-[#4ECDC4] text-center"
               style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
             >
-              Hey {selectedProfile?.name || 'adventurer'}! Ready for today&apos;s adventure?
+              {t('home.readyAdventure').replace('{name}', selectedProfile?.name || 'adventurer')}
             </p>
           </StoryPopup>
         </div>
@@ -282,15 +284,15 @@ export default function Home() {
           <h2
             className={`hero-text text-3xl sm:text-5xl text-center text-[#4ECDC4] mb-8 transition-opacity duration-500 ${menuReveal.visible ? 'opacity-100 animate-slide-up' : 'opacity-0'}`}
           >
-            WHAT DO YOU WANT TO DO?
+            {t('home.whatToDo')}
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <SectionCard
               href="/library"
               icon="/triceratops.png"
-              label="BROWSE BOOKS"
-              description="Read your favorite stories!"
+              label={t('home.browseBooks')}
+              description={t('home.browseBooksDesc')}
               bg="#0B3D1C"
               borderColor="border-[#22C55E]"
               delay={0.1}
@@ -300,8 +302,8 @@ export default function Home() {
               href="/games"
               icon="/crab.png"
               iconSize={150}
-              label="PLAY GAMES"
-              description="Learn while having fun!"
+              label={t('home.playGames')}
+              description={t('home.playGamesDesc')}
               bg="#0C4A6E"
               borderColor="border-[#38BDF8]"
               delay={0.2}
@@ -310,8 +312,8 @@ export default function Home() {
             <SectionCard
               href="/activity-pages"
               icon="/elephant.avif"
-              label="ACTIVITY PAGES"
-              description="Print and play!"
+              label={t('home.activityPages')}
+              description={t('home.activityPagesDesc')}
               bg="#5C3D1E"
               borderColor="border-[#D4A76A]"
               delay={0.3}
@@ -321,8 +323,8 @@ export default function Home() {
               <SectionCard
                 href="/upload"
                 icon="/upload.png"
-                label="UPLOAD"
-                description="Add new books & activities"
+                label={t('home.upload')}
+                description={t('home.uploadDesc')}
                 bg="#0A2F15"
                 borderColor="border-[#4ECDC4]"
                 delay={0.4}
@@ -344,12 +346,12 @@ export default function Home() {
               className="text-2xl sm:text-3xl font-black text-shimmer mb-2"
               style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
             >
-              Every adventure starts with a page turn!
+              {t('home.pageTurn')}
             </p>
           </StoryPopup>
           <StoryPopup direction="center" delay={0.3}>
             <p className="text-base text-white/50 font-medium">
-              Made with love for Santorio & Amado
+              {t('home.madeWithLove')}
             </p>
           </StoryPopup>
         </div>

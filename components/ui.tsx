@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useLanguage } from '@/lib/i18n'
 
 // ---- Card: Bold card with 3D tilt ----
 export function Card({
@@ -40,7 +41,7 @@ export function GameCard({
   className = '',
 }: {
   children: React.ReactNode
-  color?: 'purple' | 'blue' | 'green' | 'indigo' | 'orange' | 'yellow'
+  color?: 'purple' | 'blue' | 'green' | 'indigo' | 'orange' | 'yellow' | 'mario'
   className?: string
 }) {
   const colorMap = {
@@ -50,6 +51,7 @@ export function GameCard({
     indigo: 'border-sky-500 bg-[#0C3650] shadow-[0_8px_0_rgba(14,165,233,0.4)]',
     orange: 'border-orange-500 bg-[#4A2C0A] shadow-[0_8px_0_rgba(251,146,60,0.4)]',
     yellow: 'border-yellow-500 bg-[#3D3A0A] shadow-[0_8px_0_rgba(250,204,21,0.4)]',
+    mario: 'mario-question-block border-4',
   }
 
   return (
@@ -61,8 +63,6 @@ export function GameCard({
     </div>
   )
 }
-
-// ---- Shared image helpers ----
 
 export function PageTitle({
   src,
@@ -195,14 +195,36 @@ export function GameButton({
 
 export function GameLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 py-8">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 py-8 relative overflow-hidden">
+      {/* Floating ? blobs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+        <span className="absolute text-[12rem] font-black text-white/[0.03] question-drift-1" style={{ top: '10%', left: '5%' }}>?</span>
+        <span className="absolute text-[8rem] font-black text-white/[0.03] question-drift-2" style={{ top: '60%', right: '8%' }}>?</span>
+        <span className="absolute text-[10rem] font-black text-white/[0.03] question-drift-3" style={{ bottom: '5%', left: '40%' }}>?</span>
+      </div>
       {children}
     </div>
   )
 }
 
-// ---- GameHeader: Bold text with star counter ----
-export function GameHeader({ title, score }: { title: string; score: number }) {
+// ---- GameHeader: Bold text with coin counter + optional Mario HUD ----
+export function GameHeader({
+  title,
+  score,
+  lives,
+  world,
+  powerUp,
+  onDismissPowerUp,
+}: {
+  title: string
+  score: number
+  lives?: number
+  world?: string
+  powerUp?: 'none' | 'mushroom' | 'star' | 'fire-flower' | '1-up' | 'rainbow-star'
+  onDismissPowerUp?: () => void
+}) {
+  const { t } = useLanguage()
+
   return (
     <div className="text-center">
       <h1
@@ -211,10 +233,44 @@ export function GameHeader({ title, score }: { title: string; score: number }) {
       >
         {title}
       </h1>
-      <p className="text-lg font-bold text-[#22C55E]">
-        <span className="inline-block animate-heartbeat">⭐</span>{' '}
-        Stars collected: {score}
-      </p>
+
+      {/* Mario HUD row */}
+      <div className="flex items-center justify-center gap-4 flex-wrap">
+        {/* World badge */}
+        {world && (
+          <span className="px-3 py-1 rounded-full bg-[#22C55E]/20 border border-[#22C55E]/40 text-sm font-bold text-[#22C55E]">
+            {world}
+          </span>
+        )}
+
+        {/* Coin counter */}
+        <p className="text-lg font-bold text-[#FFD93D]">
+          <span className="inline-block animate-coin-spin">🪙</span>{' '}
+          x {score}
+        </p>
+
+        {/* Lives */}
+        {lives !== undefined && (
+          <p className="text-lg font-bold text-[#22C55E]">
+            {Array.from({ length: lives }).map((_, i) => (
+              <span key={i} className="inline-block">🍄</span>
+            ))}
+            {lives === 0 && <span className="text-red-400">0</span>}
+          </p>
+        )}
+      </div>
+
+      {/* Power-up overlay trigger */}
+      {powerUp && powerUp !== 'none' && onDismissPowerUp && (
+        <div className="mt-2">
+          <span className="text-sm font-bold text-[#FFD93D]">
+            {powerUp === 'rainbow-star' ? t('powerUp.rainbow') :
+             powerUp === '1-up' ? t('powerUp.extraLife') :
+             powerUp === 'fire-flower' ? t('powerUp.fireFlower') :
+             powerUp === 'star' ? t('powerUp.star') : t('powerUp.mushroom')}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

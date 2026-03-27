@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from 'next/navigation'
+import { useLanguage } from '@/lib/i18n'
 
 interface Profile {
     id: string
@@ -16,9 +17,12 @@ interface Profile {
 const marqueeText = "BOOKS \u2022 GAMES \u2022 ADVENTURE \u2022 LEARN \u2022 PLAY \u2022 EXPLORE \u2022 READ \u2022 FUN \u2022 "
 
 export default function Header() {
+    const { lang, setLang, t } = useLanguage()
     const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
     const pathname = usePathname()
     const isProfilePage = pathname === '/profiles'
+
+    const currentMarquee = t('marquee')
 
     useEffect(() => {
         const profileData = sessionStorage.getItem('selectedProfile')
@@ -42,7 +46,16 @@ export default function Header() {
                     />
                 </Link>
 
-                {selectedProfile && !isProfilePage && (
+                <div className="flex items-center gap-2 sm:gap-3">
+                    <button
+                        onClick={() => setLang(lang === 'en' ? 'es' : 'en')}
+                        className="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-white/10 hover:bg-white/20 border-2 border-[#4ECDC4]/50 rounded-full transition-all duration-300 hover:scale-105 text-lg sm:text-xl"
+                        aria-label="Toggle language"
+                    >
+                        {lang === 'en' ? '🇲🇽' : '🇺🇸'}
+                    </button>
+
+                    {selectedProfile && !isProfilePage && (
                     <Link
                         href="/profiles"
                         className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 border-2 border-[#4ECDC4]/50 rounded-full transition-all duration-300 hover:scale-105"
@@ -60,10 +73,11 @@ export default function Header() {
                         )}
                         <div className="flex flex-col">
                             <span className="text-xs sm:text-sm font-bold text-white drop-shadow-sm">{selectedProfile.name}</span>
-                            <span className="text-[10px] sm:text-xs text-[#22C55E]/80 hidden sm:block">Switch Profile</span>
+                            <span className="text-[10px] sm:text-xs text-[#22C55E]/80 hidden sm:block">{t('switchProfile')}</span>
                         </div>
                     </Link>
                 )}
+                </div>
             </nav>
 
             {/* Scrolling marquee ticker */}
@@ -75,7 +89,7 @@ export default function Header() {
                             className="text-sm font-black text-white/90 tracking-widest whitespace-nowrap px-2 drop-shadow-sm"
                             style={{ fontFamily: 'var(--font-fredoka), Fredoka, sans-serif' }}
                         >
-                            {marqueeText}
+                            {currentMarquee}
                         </span>
                     ))}
                 </div>

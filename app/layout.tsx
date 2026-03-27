@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import MouseGlow from "@/components/mouse-glow";
+import { LanguageWrapper } from "@/components/language-wrapper";
 
 const fredoka = Fredoka({
   variable: "--font-fredoka",
@@ -28,10 +29,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${fredoka.variable} ${quicksand.variable} antialiased min-h-screen flex flex-col`}
       >
+        <LanguageWrapper>
         {/* Animated background blobs */}
         <div className="bg-blobs" aria-hidden="true">
           <div className="blob blob-1" />
@@ -46,6 +48,7 @@ export default function RootLayout({
           {children}
         </div>
         <Footer/>
+        </LanguageWrapper>
       </body>
     </html>
   );
